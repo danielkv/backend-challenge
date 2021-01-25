@@ -1,6 +1,6 @@
-import { Repository } from 'typeorm';
+import { AbstractRepository, Repository } from 'typeorm';
 
 /**
  * Base repository in case need to extend functionalities
  */
-export class BaseRepository<Repo> extends Repository<Repo> {}
+export class BaseRepository<Entity> extends Repository<Entity> {}

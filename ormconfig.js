@@ -1,4 +1,5 @@
 module.exports = {
+    name: 'default',
     type: 'mysql',
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_PORT,

@@ -11,7 +11,7 @@ export class ProductRepository extends BaseRepository<ProductEntity> implements 
     findByName(productName: string): Promise<ProductEntity> {
         const query = this.createQueryBuilder('product');
 
-        query.where('products.name = :name');
+        query.where('product.name LIKE :name');
 
         query.setParameters({ name: productName });
 
