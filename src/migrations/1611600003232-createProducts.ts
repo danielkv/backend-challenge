@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { csvImporter } from '../helpers/importer';
-import { ProductDTO } from '../modules/product/product.dto';
+import { ProductDTO } from '../modules/product/dto/product.dto';
 import { ProductEntity } from '../modules/product/product.entity';
 import path from 'path';
 
