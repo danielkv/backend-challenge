@@ -1,6 +1,6 @@
 import { Express, json } from 'express';
 import cors from 'cors';
-import { setupModules } from './routes.setup';
+import { setupModules } from './modules.setup';
 import { errorHandler } from '../error-handler';
 
 export async function setupServer(app: Express): Promise<Express> {
@@ -11,7 +11,7 @@ export async function setupServer(app: Express): Promise<Express> {
     setupModules(app);
 
     // setup error handler
-    app.use(errorHandler);
+    //app.use(errorHandler);
 
     return app;
 }

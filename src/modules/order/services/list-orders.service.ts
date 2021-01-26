@@ -8,7 +8,7 @@ export class ListOrderService {
     constructor(@inject('OrderRepository') private orderRepository: IOrderRepository) {}
 
     execute(pagination?: Pagination): Promise<OrderEntity[]> {
-        if (!pagination) return this.orderRepository.find();
+        if (!pagination?.offset && !pagination?.limit) return this.orderRepository.find();
 
         return this.orderRepository.find({ skip: pagination.offset, take: pagination.limit });
     }

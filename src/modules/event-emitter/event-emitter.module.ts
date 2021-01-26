@@ -1,24 +1,22 @@
-import { Router } from 'express';
-import { Container, interfaces } from 'inversify';
+import { ContainerModule, interfaces } from 'inversify';
 import { EventEmitterService } from './event-emitter.service';
 
 export class EventEmitterModule {
-    public container: interfaces.Container;
+    public container: interfaces.ContainerModule;
 
     start() {
         // create container
-        this.container = this.bindServices();
+        this.container = this.createModule();
 
         return this.container;
     }
 
-    bindServices() {
-        // create container
-        const container = new Container();
+    createModule() {
+        const module = new ContainerModule((bind: interfaces.Bind) => {
+            // services
+            bind('EventEmitter').to(EventEmitterService);
+        });
 
-        // services
-        container.bind('EventEmitter').to(EventEmitterService);
-
-        return container;
+        return module;
     }
 }

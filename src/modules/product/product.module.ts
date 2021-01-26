@@ -1,52 +1,44 @@
-import { Container, interfaces } from 'inversify';
-import { InversifyExpressServer } from 'inversify-express-utils';
-import { Express } from 'express';
+import { ContainerModule, interfaces } from 'inversify';
 import { connectionUtils } from '../database/create-connection.service';
-import { EventEmitterModule } from '../event-emitter/event-emitter.module';
 import { ProductRepository } from './repository/product.repository';
 import { CreateProductService } from './services/create-product.service';
 import { FindProductByNameService } from './services/find-product-by-name.service';
 import { FindProductsService } from './services/find-products.service';
 
-import './product.controller';
-
 export class ProductModule {
-    public container: interfaces.Container;
+    public module: interfaces.ContainerModule;
 
-    start(routes: Express) {
-        this.container = this.bindServices();
+    start() {
+        this.module = this.createModule();
 
-        this.setupControllers(this.container, routes);
+        this.setupControllers();
 
-        return this.container;
+        return this.module;
     }
 
-    private bindServices() {
+    private createModule() {
         // create container
-        const container = new Container();
+        const module = new ContainerModule((bind: interfaces.Bind) => {
+            // repository
+            bind('ProductRepository').toConstantValue(
+                connectionUtils.connection.getCustomRepository(ProductRepository),
+            );
 
-        // repository
-        container
-            .bind('ProductRepository')
-            .toConstantValue(connectionUtils.connection.getCustomRepository(ProductRepository));
+            // services
+            bind(CreateProductService).to(CreateProductService);
+            bind(FindProductByNameService).to(FindProductByNameService);
+            bind(FindProductsService).to(FindProductsService);
 
-        // services
-        container.bind(CreateProductService).to(CreateProductService);
-        container.bind(FindProductByNameService).to(FindProductByNameService);
-        container.bind(FindProductsService).to(FindProductsService);
+            // external containers
+            /*  const eventEmitterModule = new EventEmitterModule();
+			const eventEmitterContainer = eventEmitterModule.start();
 
-        // external containers
-        const eventEmitterModule = new EventEmitterModule();
-        const eventEmitterContainer = eventEmitterModule.start();
-
-        return Container.merge(container, eventEmitterContainer);
+			//return Container.merge(container, eventEmitterContainer); */
+        });
+        return module;
     }
 
-    private setupControllers(container: interfaces.Container, app: Express) {
-        const server = new InversifyExpressServer(container, null, null, app);
-
-        server.build();
-
-        return server;
+    private setupControllers() {
+        require('./product.controller');
     }
 }
