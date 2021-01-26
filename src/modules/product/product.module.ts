@@ -1,9 +1,11 @@
 import { ContainerModule, interfaces } from 'inversify';
 import { connectionUtils } from '../database/create-connection.service';
+import { ProductQueueConsumer } from './product-queue.consumer';
 import { ProductRepository } from './repository/product.repository';
 import { CreateProductService } from './services/create-product.service';
 import { FindProductByNameService } from './services/find-product-by-name.service';
 import { FindProductsService } from './services/find-products.service';
+import { UpdateProductStockService } from './services/update-product-stock.service';
 
 export class ProductModule {
     public module: interfaces.ContainerModule;
@@ -28,12 +30,10 @@ export class ProductModule {
             bind(CreateProductService).to(CreateProductService);
             bind(FindProductByNameService).to(FindProductByNameService);
             bind(FindProductsService).to(FindProductsService);
+            bind(UpdateProductStockService).to(UpdateProductStockService);
 
-            // external containers
-            /*  const eventEmitterModule = new EventEmitterModule();
-			const eventEmitterContainer = eventEmitterModule.start();
-
-			//return Container.merge(container, eventEmitterContainer); */
+            // consumers
+            bind(ProductQueueConsumer).to(ProductQueueConsumer);
         });
         return module;
     }

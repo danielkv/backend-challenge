@@ -7,6 +7,7 @@ import { FindOrderByIdService } from './services/find-order.service';
 import { ListOrderService } from './services/list-orders.service';
 import { connectionUtils } from '../database/create-connection.service';
 import { EventEmitterService } from '../event-emitter/event-emitter.service';
+import { OrderEventListener } from './order-event.listener';
 
 export class OrderModule {
     public module: interfaces.ContainerModule;
@@ -29,6 +30,9 @@ export class OrderModule {
             bind(CreateOrderService).to(CreateOrderService);
             bind(FindOrderByIdService).to(FindOrderByIdService);
             bind(ListOrderService).to(ListOrderService);
+
+            // listeners
+            bind(OrderEventListener).to(OrderEventListener);
         });
 
         return module;
