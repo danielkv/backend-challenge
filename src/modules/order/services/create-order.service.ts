@@ -1,5 +1,6 @@
 import { In } from 'typeorm';
 import { DeepPartial } from '../../common/deep-partial.type';
+import { IEventEmitter } from '../../event-emitter/emitter.interface';
 import { IProductRepository } from '../../product/repository/product-repository.interface';
 import { OrderProductDTO } from '../dto/order-product.dto';
 import { OrderDTO } from '../dto/order.dto';
@@ -7,7 +8,11 @@ import { OrderEntity } from '../order.entity';
 import { IOrderRepository } from '../repository/order-repository.interface';
 
 export class CreateOrderService {
-    constructor(private orderRepository: IOrderRepository, private productRepository: IProductRepository) {}
+    constructor(
+        private orderRepository: IOrderRepository,
+        private productRepository: IProductRepository,
+        private eventEmitter: IEventEmitter,
+    ) {}
 
     /**
      * Create order and insert in repository
@@ -23,6 +28,9 @@ export class CreateOrderService {
 
         // save in repository
         const createdOrder = await this.orderRepository.save(order);
+
+        // events
+        this.eventEmitter.emit('createOrder', { order: createdOrder });
 
         return createdOrder;
     }

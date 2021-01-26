@@ -1,4 +1,3 @@
-import { Pagination } from '../../common/pagination.type';
 import { OrderEntity } from '../order.entity';
 import { IOrderRepository } from '../repository/order-repository.interface';
 
