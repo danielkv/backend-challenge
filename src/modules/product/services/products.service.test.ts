@@ -1,5 +1,5 @@
 import { getConnection, getCustomRepository } from 'typeorm';
-import { connection } from '../../database/create-connection.service';
+import { connectionUtils } from '../../database/create-connection.service';
 import { ProductList } from '../dto/product-list.dto';
 import { ProductEntity } from '../product.entity';
 import { ProductRepository } from '../repository/product.repository';
@@ -7,12 +7,12 @@ import { FindProductByNameService } from './find-product-by-name.service';
 import { FindProductsService } from './find-products.service';
 
 beforeAll(async (done) => {
-    await connection.create();
+    await connectionUtils.create();
     return done();
 });
 
 afterAll(async (done) => {
-    await connection.close();
+    await connectionUtils.close();
     return done();
 });
 

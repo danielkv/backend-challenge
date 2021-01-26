@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import { injectable } from 'inversify';
+import { getConnection } from 'typeorm';
 import { Pagination } from '../common/pagination.type';
 import { ProductList } from './dto/product-list.dto';
 import { FindProductByNameService } from './services/find-product-by-name.service';
@@ -7,7 +9,8 @@ import { FindProductsService } from './services/find-products.service';
 /**
  * It controls the products requests /  responses
  */
-export class CustomerController {
+@injectable()
+export class ProductController {
     constructor(
         private findProductByNameService: FindProductByNameService,
         private findProductsService: FindProductsService,

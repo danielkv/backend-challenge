@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { In } from 'typeorm';
 import { DeepPartial } from '../../common/deep-partial.type';
 import { IEventEmitter } from '../../event-emitter/emitter.interface';
@@ -7,11 +8,12 @@ import { OrderDTO } from '../dto/order.dto';
 import { OrderEntity } from '../order.entity';
 import { IOrderRepository } from '../repository/order-repository.interface';
 
+@injectable()
 export class CreateOrderService {
     constructor(
-        private orderRepository: IOrderRepository,
-        private productRepository: IProductRepository,
-        private eventEmitter: IEventEmitter,
+        @inject('OrderRepository') private orderRepository: IOrderRepository,
+        @inject('ProductRepository') private productRepository: IProductRepository,
+        @inject('EventEmitter') private eventEmitter: IEventEmitter,
     ) {}
 
     /**

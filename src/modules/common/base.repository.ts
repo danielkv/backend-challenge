@@ -1,6 +1,13 @@
-import { AbstractRepository, Repository } from 'typeorm';
+import { decorate, injectable } from 'inversify';
+import { Repository } from 'typeorm';
 
+decorate(injectable(), Repository);
 /**
  * Base repository in case need to extend functionalities
  */
-export class BaseRepository<Entity> extends Repository<Entity> {}
+@injectable()
+export class BaseRepository<Entity> extends Repository<Entity> {
+    finddale() {
+        return 'asd';
+    }
+}

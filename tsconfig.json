@@ -5,6 +5,7 @@
         "lib": ["es2018", "esnext.asynciterable"] /* Specify library files to be included in the compilation. */,
 
         "outDir": "/src/build" /* Redirect output structure to the directory. */,
+        "types": ["reflect-metadata"],
 
         //"strict": true /* Enable all strict type-checking options. */,
 

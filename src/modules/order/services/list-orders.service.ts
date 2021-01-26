@@ -1,9 +1,11 @@
+import { inject, injectable } from 'inversify';
 import { Pagination } from '../../common/pagination.type';
 import { OrderEntity } from '../order.entity';
 import { IOrderRepository } from '../repository/order-repository.interface';
 
+@injectable()
 export class ListOrderService {
-    constructor(private orderRepository: IOrderRepository) {}
+    constructor(@inject('OrderRepository') private orderRepository: IOrderRepository) {}
 
     execute(pagination?: Pagination): Promise<OrderEntity[]> {
         if (!pagination) return this.orderRepository.find();

@@ -1,10 +1,10 @@
-import { DeepPartial } from '../../common/deep-partial.type';
-import { ProductDTO } from '../dto/product.dto';
+import { inject, injectable } from 'inversify';
 import { ProductEntity } from '../product.entity';
 import { IProductRepository } from '../repository/product-repository.interface';
 
+@injectable()
 export class FindProductByNameService {
-    constructor(private productRepository: IProductRepository) {}
+    constructor(@inject('ProductRepository') private productRepository: IProductRepository) {}
 
     /**
      * Search product by name
