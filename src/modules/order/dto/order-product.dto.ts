@@ -1,4 +1,4 @@
-export class OrderProductEntityDTO {
+export class OrderProductDTO {
     id?: number;
 
     name: string;

@@ -1,9 +1,9 @@
-import { OrderProductEntityDTO } from './order-product.dto';
+import { OrderProductDTO } from './order-product.dto';
 
 export class OrderDTO {
     id?: number;
 
-    products: OrderProductEntityDTO[];
+    products: OrderProductDTO[];
 
-    quantity: number;
+    total?: number;
 }

@@ -1,4 +1,6 @@
 import { Repository } from 'typeorm';
+import { DeepPartial } from '../../common/deep-partial.type';
+import { OrderDTO } from '../dto/order.dto';
 import { OrderEntity } from '../order.entity';
 
 /**
