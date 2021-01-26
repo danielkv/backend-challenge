@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { injectable } from 'inversify';
+import { controller, httpGet } from 'inversify-express-utils';
 import { getConnection } from 'typeorm';
 import { Pagination } from '../common/pagination.type';
 import { ProductList } from './dto/product-list.dto';
@@ -9,14 +9,14 @@ import { FindProductsService } from './services/find-products.service';
 /**
  * It controls the products requests /  responses
  */
-@injectable()
+@controller('/products')
 export class ProductController {
     constructor(
         private findProductByNameService: FindProductByNameService,
         private findProductsService: FindProductsService,
     ) {}
 
-    // GET /products/:name
+    @httpGet('/:name')
     async findOne(req: Request, res: Response, next: NextFunction) {
         // extract body params and check if it's defined
         const productName = req?.params?.name;
@@ -29,7 +29,7 @@ export class ProductController {
         return res.json(product);
     }
 
-    // GET /products
+    @httpGet('/')
     async findMany(req: Request, res: Response, next: NextFunction) {
         const pagination: Pagination = {
             offset: req?.query?.offset ? Number(req.query.offset) : undefined,
