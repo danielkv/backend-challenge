@@ -7,5 +7,5 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
     if (!err) return next();
 
     res.status(500);
-    return res.render('html', { error: err });
+    return res.json({ error: err });
 }

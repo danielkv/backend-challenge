@@ -1,7 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
-import { controller, httpGet, next, queryParam, requestParam, response } from 'inversify-express-utils';
+import {
+    controller,
+    httpGet,
+    httpPost,
+    next,
+    queryParam,
+    requestBody,
+    requestParam,
+    response,
+} from 'inversify-express-utils';
+import { ObjectLiteral } from '../common/object-literal.type';
 import { Pagination } from '../common/pagination.type';
 import { OrderList } from './dto/order-list.dto';
+import { OrderProductDTO } from './dto/order-product.dto';
+import { CreateOrderService } from './services/create-order.service';
 import { FindOrderByIdService } from './services/find-order.service';
 import { ListOrderService } from './services/list-orders.service';
 
@@ -10,7 +22,21 @@ import { ListOrderService } from './services/list-orders.service';
  */
 @controller('/orders')
 export class OrderController {
-    constructor(private findOrderByIdService: FindOrderByIdService, private listOrderService: ListOrderService) {}
+    constructor(
+        private findOrderByIdService: FindOrderByIdService,
+        private listOrderService: ListOrderService,
+        private createOrderService: CreateOrderService,
+    ) {}
+
+    @httpPost('/')
+    async create(@requestBody() body: ObjectLiteral, @response() res: Response, @next() next: NextFunction) {
+        const products: OrderProductDTO[] = body.products;
+        if (!products || !products?.length) throw new Error('No products in body');
+
+        const order = await this.createOrderService.execute(products);
+
+        res.json(order);
+    }
 
     @httpGet('/:id')
     async findOne(@requestParam('id') orderId: number, @response() res: Response, @next() next: NextFunction) {

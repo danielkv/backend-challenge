@@ -6,7 +6,7 @@ export class OrderEntity {
     @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.referenceProduct, { cascade: true })
+    @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.order, { cascade: true })
     products: OrderProductEntity[];
 
     @Column('float')

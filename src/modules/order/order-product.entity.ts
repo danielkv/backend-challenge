@@ -26,7 +26,7 @@ export class OrderProductEntity {
     @JoinColumn({ name: 'orderId', referencedColumnName: 'id' })
     order: OrderEntity;
 
-    @OneToOne(() => ProductEntity, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+    @ManyToOne(() => ProductEntity, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
     @JoinColumn({ name: 'referenceProductId', referencedColumnName: 'id' })
     referenceProduct: OrderEntity;
 }

@@ -11,7 +11,7 @@ export async function setupServer(app: Express): Promise<Express> {
     setupModules(app);
 
     // setup error handler
-    //app.use(errorHandler);
+    app.use(errorHandler);
 
     return app;
 }
