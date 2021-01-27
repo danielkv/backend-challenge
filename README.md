@@ -4,12 +4,12 @@ Backend Challenge - this project was made to test the Queues in RabbitMQ.
 
 # Table of contents
 
-- [Backend Challenge](#backend-challenge)
-- [Table of contents](#table-of-contents)
-- [How to run this project](#how-to-run-this-project)
-- [Run tests](#run-tests)
-- [API Documentation](#api-documentation)
-	- [REST API](#rest-api)
+-   [Backend Challenge](#backend-challenge)
+-   [Table of contents](#table-of-contents)
+-   [How to run this project](#how-to-run-this-project)
+-   [Run tests](#run-tests)
+-   [API Documentation](#api-documentation)
+    -   [REST API](#rest-api)
 
 # How to run this project
 
@@ -32,7 +32,7 @@ The **server** should run at `https://localhost:3000`
 To run tests, you need to run the **RabbitMQ** and **MySQL** before. Run this code in the **terminal** in the root folder of repository:
 
 ```
-docker-compose up -d mysql rabbitmq
+docker-compose up -d mysql rabbitmq migration
 ```
 
 **AND THEN:** \
