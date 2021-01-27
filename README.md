@@ -1,164 +1,400 @@
 # Backend Challenge
 
-Bem-vindx ao desafio técnico para a vaga de backend na Delivery Much! 🍽
+Backend Challenge - this project was made to test the Queues in RabbitMQ.
 
-O mercadinho de Seu Zé, como diversos pequenos empreendimentos do Brasil, sofreu com a redução do volume de vendas no meio físico durante a pandemia de COVID-19. Buscando encontrar soluções para seu problema, viu na Delivery Much uma possível saída para sustentar seu negócio: levá-lo para o meio digital, atraindo clientes de diferentes bairros de sua cidade em Alegrete, no Rio Grande do Sul.
+# Table of contents
 
-Atualmente, a única etapa de seu negócio digitalizada é o controle de estoque. Há um serviço que, com atualizações na quantidade dos produtos em estoque, envia mensagens no protocolo AMQP (via [RabbitMQ](https://www.rabbitmq.com/)). Um dos maiores desafios que Seu Zé possui para embarcar na Delivery Much seria acompanhar a quantidade de produtos em estoque ao receber pedidos.
+- [Backend Challenge](#backend-challenge)
+- [Table of contents](#table-of-contents)
+- [How to run this project](#how-to-run-this-project)
+- [Run tests](#run-tests)
+- [API Documentation](#api-documentation)
+	- [REST API](#rest-api)
 
-Sua tarefa como dev backend consistirá em auxiliar o Seu Zé no processo de digitalização de seu negócio, desenvolvendo um serviço que consuma essas atualizações de estoque e faça o controle de pedidos: rejeitando-os se os produtos não estiverem disponíveis e aceitando-os em caso contrário.
+# How to run this project
 
-## Desafio
+This project uses **docker** and **docker-compose** to run.
 
-Para começar, Seu Zé irá disponibilizar um [.csv](products.csv) com a lista de produtos que seu mercado vende, com nome (`name`), preço (`price`) e quantidade (`quantity`). Você precisará criar um processo de carregamento desses dados (por exemplo: um script de populate) para armazená-los em uma base de dados de sua escolha para o projeto. Eles serão os dados iniciais para efetuar o controle de estoque, calcular o preço dos pedidos e validar a existência de produtos enviados pelo serviço de estoque, pois podem haver casos onde será enviado adição ou subtração de produtos que não estão na lista.
+Run in the **terminal**:
 
-Seu projeto deve consumir as mensagens enviadas pelo serviço de estoque no RabbitMQ e atualizar a quantidade do produto enviado. Essas mensagens de atualizações de estoque serão enviadas ininterruptamente, com intervalo de 1 segundo entre cada envio.
-
-Ele também deve ser uma API REST, contendo quatro endpoints para fazer as ações de criar e buscar pedidos e produtos. Avaliaremos a API em questão na estruturação da resposta conforme os exemplos na seção de [API](#API), código de status apropriado e desempenho.
-
-### RabbitMQ
-
-As mensagens de alteração de estoque de produto enviadas pelo serviço de estoque são disparadas na exchange `stock`, com a routing key `incremented` para adição e `decremented` para a subtração. O tipo da exchange é `direct`. O body da mensagem possui o nome do produto em questão como conteúdo, ex. `Lettuce`.
-
-O serviço de estoque e o RabbitMQ estão disponíveis no [docker-compose.yml](docker-compose.yml) e serão executados pelo comando abaixo:
-
-```shell
-$ docker-compose up
+```
+git clone https://github.com/danielkv/backend-challenge backend-challenge
+cd backend-challenge
+docker-compose up
 ```
 
-O serviço do RabbitMQ estará disponível na porta: `5672` e a UI do RabbitMQ Management estará na porta: `15672` (`http://localhost:15672/`) com user: `guest` e password: `guest`.
+The **server** should run at `https://localhost:3000`
 
-  > Caso já exista uma instância do RabbitMQ rodando na sua máquina é preciso interrompê-la e utilizar a que é disponibilizada ao executar o docker-compose. 
+# Run tests
 
-Aguarde os containers terminarem de iniciar. Se der tudo certo, você verá o log de quais alimentos entraram no estoque:
+---
 
-```shell
-stock-service_1  | Message sent to incremented:
-stock-service_1  |     Tea
-stock-service_1  | Message sent to decremented:
-stock-service_1  |     Coffee
+To run tests, you need to run the **RabbitMQ** and **MySQL** before. Run this code in the **terminal** in the root folder of repository:
+
+```
+docker-compose up -d mysql rabbitmq
 ```
 
-### API
+**AND THEN:** \
+With yarn
 
-Sua API REST deve conter os endpoints conforme:
+```
+yarn test
+```
 
-1. Um deles deve retornar os produtos com o preço e quantidade em estoque atual:
+With npm:
+
+```
+npm run test
+```
+
+# API Documentation
+
+The backend was build on top of **ExpressJS** with **Typescript**.
+
+## REST API
+
+**Base URL**
+
+> `https://localhost:3000/`
+
+Find many products
+
+```
+[GET] /products
+```
+
+| Query Param | Type     | Required | Default     | Description                |
+| ----------- | -------- | -------- | ----------- | -------------------------- |
+| offset      | `number` | No       | `undefined` | Pagination cursor          |
+| limit       | `number` | No       | `undefined` | Number of rows to retrieve |
+
+**Response** \
+The response returns 2 objects: **items** and **pageInfo**
+
+<details>
+	<summary><b>response</b>: the response from server</summary>
+	<p>
+
+    {
+    	items: array of products
+    	pageInfo: pagination details
+    }
+
+</p>
+
+</details>
+
+<details>
+	<summary><b>items</b>: products list</summary>
+	<p>
+
+    items: [
+    	{
+            id: 1,
+            name: "Angelica",
+            price: 5.6,
+            quantity: 0
+        },
+        {
+            id: 2,
+            name: "Savoy cabbage",
+            price: 4.37,
+            quantity: 0
+        },
+    	...
+    ]
+
+</p>
+
+</details>
+<details>
+	<summary><b>pageInfo</b>: pagination details</summary>
+	<p>
+
+    pageInfo: {
+    	itemsTotal: 50,
+    	offset: 0,
+    	limit: 10
+    }
+
+</p>
+
+</details>
+<br>
+
+**Examples**
+
+`[GET] /products` \
+`[GET] /products?offset=0&limit=10`
+
+---
+
+Find 1 product
 
 ```
 [GET] /products/:name
 ```
 
-Response exemplo: 
+| Query Param | Type     | Required | Default | Description                          |
+| ----------- | -------- | -------- | ------- | ------------------------------------ |
+| name        | `string` | Yes      | --      | Find one product within a given name |
 
-```json
-{
-  "name": "Brazil nut",
-  "price": 5.16,
-  "quantity": 5
+**Response** \
+The response returns 1 object: the product object
+
+<details>
+	<summary><b>response</b>: product found</summary>
+	<p>
+    	
+	{
+		"id": 4,
+		"name": "Kiwi",
+		"price": 9.21,
+		"quantity": 0
+	}
+
+</p>
+
+</details>
+<br>
+
+**Example**
+
+`[GET] /products/Kiwi`
+
+---
+
+**Create / Update stock** \
+This endpoint creates a new products. Case the product already exists (same **name**), it will update the stock increasing or decreasing the quantity send in the body.
+
+```
+[POST] /products
+```
+
+| Body    | Type     | Required | Default | Description                               |
+| ------- | -------- | -------- | ------- | ----------------------------------------- |
+| product | `object` | Yes      | --      | The product object to be added or updated |
+
+<br>
+
+Product object
+
+| Body     | Type     | Required | Default | Description                                                    |
+| -------- | -------- | -------- | ------- | -------------------------------------------------------------- |
+| name     | `string` | Yes      | --      | Product name, used to search if product exists                 |
+| price    | `number` | No       | 0       | Price for the new product. It doesn't update existing products |
+| quantity | `number` | No       | 1       | Product initial stock. Used to update existing products stock  |
+
+**Response** \
+The response returns 1 object: the created/updated product object
+
+<details>
+	<summary><b>response</b>: product found</summary>
+	<p>
+    	
+	{
+		"id": 4,
+		"name": "Kiwi",
+		"price": 9.21,
+		"quantity": 3
+	}
+
+</p>
+
+</details>
+<br>
+
+**Example**
+
+`[POST] /products` \
+body:
+
+```
+product: {
+	"name": "Kiwi",
+	"quantity": 3
 }
 ```
 
-2. Para registrar um pedido novo, seu serviço deverá receber uma lista de produtos do pedido via POST para o seguinte endpoint:
+---
 
-```
-[POST] /orders
-```
-
-Body exemplo: 
-
-```json
-{
-  "products": [
-    {
-      "name": "Kiwi",
-      "quantity": 1
-    }
-  ]
-}
-```
-
-Response exemplo:
-
-```json
-{
-  "id": "42",
-  "products": [
-    {
-      "name": "Kiwi",
-      "quantity": 1,
-      "price": 9.21
-    }
-  ],
-  "total": 9.21
-}
-```
-
-  > Lembre-se de fazer a checagem da disponibilidade do estoque dos produtos que vieram na requisição antes de registrar o pedido e de atualizar a quantidade dos produtos em estoque. Ao salvá-lo, crie também um identificador único `id` para o pedido.
-
-3. Além disso, o serviço terá que possuir um endpoint para listar os pedidos realizados e aprovados, retornando os produtos do pedido e o valor total da compra. O endpoint de listagem deverá seguir o seguinte formato:
+Find many orders
 
 ```
 [GET] /orders
 ```
 
-Response exemplo:
+| Query Param | Type     | Required | Default     | Description             |
+| ----------- | -------- | -------- | ----------- | ----------------------- |
+| offset      | `number` | No       | `undefined` | Pagination start cursor |
+| limit       | `number` | No       | `undefined` | Customers per page      |
 
-```json
-{
-  "orders": [
-      {
-        "id": "123",
-        "products": [
-          {
-            "name": "Watermelon",
-            "quantity": 2,
-            "price": 5.47
-          }
-         ],
-        "total": 10.94
-     }
-  ]
-}
-```
+**Response** \
+The response returns 2 objects: **items** and **pageInfo**
 
-4. Endpoint irá retornar apenas pedidos individuais, dado um `id`:
+<details>
+	<summary><b>response</b>: the response from server</summary>
+	<p>
+
+    {
+    	items: array of customers
+    	pageInfo: pagination details
+    }
+
+</p>
+
+</details>
+
+<details>
+	<summary><b>items</b>: order list</summary>
+	<p>
+
+    items: [
+    	{
+            id: 1,
+            total: 9.21,
+            products: [
+                {
+                    id: 1,
+                    name: "Kiwi",
+                    price: 9.21,
+                    quantity: 1,
+                    referenceProductId: 4,
+                    orderId: 1
+                }
+    			...
+            ]
+        },
+    	...
+    ]
+
+</p>
+
+</details>
+<details>
+	<summary><b>pageInfo</b>: pagination details</summary>
+	<p>
+
+    pageInfo: {
+    	itemsTotal: 20,
+    	offset: 0,
+    	limit: 10
+    }
+
+</p>
+
+</details>
+<br>
+
+**Example**
+
+`[GET] /orders`
+`[GET] /orders?offset=0&limit=10`
+
+---
+
+Find order by id
 
 ```
 [GET] /orders/:id
 ```
 
-Response exemplo:
+| Param | Type     | Required | Default | Description |
+| ----- | -------- | -------- | ------- | ----------- |
+| id    | `number` | Yes      | --      | Order ID    |
 
-```json
-{
-  "id": "456",
-  "products": [
-    {
-      "name": "Coffee",
-      "quantity": 3,
-      "price": 2.43
-    }
-  ],
-  "total": 7.29
-}
+**Response** \
+The response returns 1 object: the order object
+
+<details>
+	<summary><b>response</b>: order found</summary>
+	<p>
+    	
+	{
+		products: [
+			{
+				name: "Kiwi",
+				quantity: 2,
+				referenceProductId: 4, // ID reference the product
+				price: 18.42,
+				orderId: 8,
+				id: 8
+			}
+		],
+		total: 18.42,
+		id: 8
+	}
+
+</p>
+
+</details>
+<br>
+
+**Example**
+
+`GET /orders/305`
+
+---
+
+Create new order
+
 ```
-## Avaliação
+[POST] /orders
+```
 
-A intenção principal deste desafio é avaliar suas habilidades em:
+| Body     | Type    | Required | Default | Description                               |
+| -------- | ------- | -------- | ------- | ----------------------------------------- |
+| products | `array` | Yes      | --      | The product object to be added or updated |
 
-- Estruturar e armazenar dados de modo eficiente;
-- Realizar comunicação com serviços externos;
-- Escrever código legível, desacoplado e modularizado;
-- Lidar com serviços de mensageria;
-- Efetuar o design e arquitetura de APIs.
+<br>
 
-## Requisitos
+Products array of
 
-- Utilizar Go ou Node.js;
-- Disponibilizar documentação suficiente para a execução do projeto no README;
-- Utilizar arquivos de ambiente para armazenar configurações/chaves de ambiente (caso precise);
-- Atender os cenários de uso explicitados;
-- Tratar erros e indisponibilidade de serviços externos;
-- Desenvolver testes;
-- Utilizar Docker.
+| Body     | Type     | Required | Default | Description                                                   |
+| -------- | -------- | -------- | ------- | ------------------------------------------------------------- |
+| name     | `string` | Yes      | --      | Product name, used to search if product exists                |
+| quantity | `number` | Yes      | --      | Product initial stock. Used to update existing products stock |
+
+You can actually send the intire product object, but will not be used. These are the only fields that are usefull to create a new order
+
+**Response** \
+The response returns 1 object: the created order object
+
+<details>
+	<summary><b>response</b>: order created</summary>
+	<p>
+    	
+	{
+		id: 2,
+		total: 9.21,
+		products: [
+			{
+				id: 2,
+				name: "Kiwi",
+				price: 9.21,
+				quantity: 1,
+				referenceProductId: 4,
+				orderId: 2
+			}
+		]
+	}
+
+</p>
+
+</details>
+<br>
+
+**Example**
+
+`[POST] /orders` \
+body:
+
+```
+products: [
+	{
+		"name": "Kiwi",
+		"quantity": 1
+	}
+]
+```
