@@ -11,6 +11,9 @@ const eventEmitter = new EventEmitter();
 @injectable()
 export class EventEmitterService implements IEventEmitter {
     emit<T = ObjectLiteral>(event: string, args: T): void {
+        // don't emit events if it's test enviroment, it can cause errors
+        if (process.env.NODE_ENV === 'test') return;
+
         setImmediate(() => eventEmitter.emit(event, args));
     }
 

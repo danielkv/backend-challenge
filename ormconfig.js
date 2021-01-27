@@ -12,5 +12,5 @@ module.exports = {
         migrationsDir: './src/migrations',
     },
 
-    logging: process.env.NODE_ENV !== 'production',
+    logging: !['test', 'production'].includes(process.env.NODE_ENV),
 };

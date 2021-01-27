@@ -14,8 +14,6 @@ export class ProductRepository extends BaseRepository<ProductEntity> implements 
 
         query.setParameters({ name: `%${productName}%` });
 
-        console.log(query.getSql());
-
         return query.getOne();
     }
 }

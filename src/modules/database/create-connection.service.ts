@@ -10,10 +10,12 @@ class ConnectionSetup {
     }
 
     async close() {
-        if (this.connection) return;
+        if (!this.connection) return;
 
-        await getConnection().close();
+        await this.connection.close();
         this.connection = null;
+
+        return true;
     }
 }
 

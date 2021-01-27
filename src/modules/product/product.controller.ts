@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { controller, httpGet } from 'inversify-express-utils';
-import { getConnection } from 'typeorm';
+import { controller, httpGet, httpPost, requestBody, response, next } from 'inversify-express-utils';
+import { ObjectLiteral } from '../common/object-literal.type';
 import { Pagination } from '../common/pagination.type';
+import { OrderProductDTO } from '../order/dto/order-product.dto';
 import { ProductList } from './dto/product-list.dto';
+import { CreateProductService } from './services/create-product.service';
 import { FindProductByNameService } from './services/find-product-by-name.service';
 import { FindProductsService } from './services/find-products.service';
 
@@ -14,7 +16,18 @@ export class ProductController {
     constructor(
         private findProductByNameService: FindProductByNameService,
         private findProductsService: FindProductsService,
+        private createProductService: CreateProductService,
     ) {}
+
+    @httpPost('/')
+    async create(@requestBody() body: ObjectLiteral, @response() res: Response, @next() next: NextFunction) {
+        const product: OrderProductDTO = body.product;
+        if (!product) throw new Error('No product in body');
+
+        const productCreated = await this.createProductService.execute(product);
+
+        res.json(productCreated);
+    }
 
     @httpGet('/:name')
     async findOne(req: Request, res: Response, next: NextFunction) {

@@ -14,13 +14,26 @@ export class CreateProductService {
 
     /**
      * Insert new product in repository
+     * If product already exists, add the quantity to stock (search for name)
      */
     async execute(product: DeepPartial<ProductDTO>): Promise<ProductEntity> {
-        const createProduct = await this.productRepository.save(product);
+        const productExists = await this.productRepository.findOne({ where: { name: product.name } });
 
-        // events
-        this.eventEmitter.emit('createProduct', { product: createProduct });
+        if (!productExists) {
+            // create new product
+            const createdProduct = await this.productRepository.save(product);
 
-        return createProduct;
+            // events
+            this.eventEmitter.emit('createProduct', { product: createdProduct });
+
+            return createdProduct;
+        } else {
+            // add the quantity to product stock
+            const newQuantity = productExists.quantity + (product.quantity || 1);
+
+            const updatedProduct = await this.productRepository.save({ ...productExists, quantity: newQuantity });
+
+            return updatedProduct;
+        }
     }
 }

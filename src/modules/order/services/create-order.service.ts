@@ -74,6 +74,8 @@ export class CreateOrderService {
         // try to find ONE product that doesn't have the needed quantity in stock
         const checked = productsToCheck.find((orderProduct) => {
             const qtyNeeded = orderProduct.quantity;
+            if (qtyNeeded <= 0) throw new Error(`Quantity in product ${orderProduct.name} has to be at leat 1`);
+
             const referenceProduct = productsInstances.find(
                 (productsInstance) => productsInstance.name === orderProduct.name,
             );
