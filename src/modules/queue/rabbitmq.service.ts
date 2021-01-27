@@ -12,8 +12,8 @@ export class RabbitMQService implements IQueueService {
      * Start a new connection and channel
      */
     async start() {
-        this.connection = await amqplib.connect(process.env.RABBITMQ_URL);
-        this.channel = await this.connection.createChannel();
+        if (!this.connection) this.connection = await amqplib.connect(process.env.RABBITMQ_URL);
+        if (!this.channel) this.channel = await this.connection.createChannel();
 
         return true;
     }
@@ -25,12 +25,12 @@ export class RabbitMQService implements IQueueService {
      * @param exchange exchange name
      * @param opts queue / exchange options
      */
-    async bindQueueToExchange(queue: string, exchange: string, type: string, opts?: BindOpts) {
-        await this.channel.assertExchange(exchange, type, opts.exchange);
+    async bindQueueToExchange(queue: string, exchange: string, type: string, rountingKey: string, opts?: BindOpts) {
+        await this.channel.assertExchange(exchange, type, opts?.exchange);
 
-        await this.channel.assertQueue(queue, opts.queue);
+        await this.channel.assertQueue(queue, opts?.queue);
 
-        await this.channel.bindExchange(queue, exchange, '');
+        await this.channel.bindQueue(queue, exchange, rountingKey);
     }
 
     /**
@@ -59,6 +59,13 @@ export class RabbitMQService implements IQueueService {
         const queueExists = await this.channel.checkQueue(queueName);
         if (!queueExists) throw new Error("Queue doesn't exists");
 
-        await this.channel.consume(queueName, fn);
+        return await this.channel.consume(queueName, fn);
+    }
+
+    /**
+     * Mark message as read, and delete it from queue
+     */
+    markAsRead(message: Message) {
+        return this.channel.ack(message);
     }
 }

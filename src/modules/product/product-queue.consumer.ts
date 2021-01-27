@@ -1,9 +1,7 @@
 import { Message } from 'amqplib';
 import { inject, injectable } from 'inversify';
-import { JsonContent } from 'inversify-express-utils';
-import { OrderEntity } from '../order/order.entity';
+import { OrderProductDTO } from '../order/dto/order-product.dto';
 import { IQueueService } from '../queue/queue-service.interface';
-import { ProductEntity } from './product.entity';
 import { UpdateProductStockService } from './services/update-product-stock.service';
 
 @injectable()
@@ -15,16 +13,25 @@ export class ProductQueueConsumer {
 
     async setup() {
         await this.queueService.start();
-        await this.queueService.consume('stock', this.changeStock);
+        await this.queueService.consume('stockQueue', (msg) => this.changeStock(msg));
     }
 
-    changeStock(message: Message) {
-        const key = message.fields.routingKey; //increment | decremented
-        const content = message.content.toString();
+    async changeStock(message: Message) {
+        try {
+            const key = message.fields.routingKey; //increment | decremented
+            const content = message.content.toString();
 
-        const product: ProductEntity = JSON.parse(content);
-        const quantity = key === 'increment' ? product.quantity : -product.quantity;
+            const product: OrderProductDTO = JSON.parse(content);
+            const quantity = key === 'increment' ? product.quantity : -product.quantity;
 
-        this.updateProductStockService.execute(product.id, quantity);
+            // decrement stock
+            await this.updateProductStockService.execute(product.referenceProductId, quantity);
+
+            // delete message from queue
+            this.queueService.markAsRead(message);
+        } catch (err) {
+            // in this case, the message should be sent to some log queue or handle the error properly
+            console.error(err);
+        }
     }
 }

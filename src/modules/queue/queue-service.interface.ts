@@ -14,7 +14,13 @@ export interface IQueueService {
      * @param exchange exchange name
      * @param opts queue / exchange options
      */
-    bindQueueToExchange(queue: string, exchange: string, type: string, opts?: BindOpts): Promise<any>;
+    bindQueueToExchange(
+        queue: string,
+        exchange: string,
+        type: string,
+        rountingKey: string,
+        opts?: BindOpts,
+    ): Promise<any>;
 
     /**
      * Publish in Exchange
@@ -33,4 +39,9 @@ export interface IQueueService {
      * @param fn Consumer function that will run when receive a message
      */
     consume(queueName: string, fn: (message: Message) => any): Promise<any>;
+
+    /**
+     * Mark message as read, and delete it from queue
+     */
+    markAsRead(message: Message): void;
 }

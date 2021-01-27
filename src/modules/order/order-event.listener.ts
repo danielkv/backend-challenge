@@ -15,16 +15,17 @@ export class OrderEventListener {
     ) {}
 
     async setup() {
-        this.eventEmitter.addListener('orderCreated', this.orderCreated);
+        this.eventEmitter.addListener('createOrder', (args) => this.createOrder(args));
 
         await this.queueService.start();
-        await this.queueService.bindQueueToExchange('stock', 'stock', 'direct');
+        await this.queueService.bindQueueToExchange('stockQueue', 'stock', 'direct', 'incremented');
+        await this.queueService.bindQueueToExchange('stockQueue', 'stock', 'direct', 'decremented');
     }
     /**
      * Publish a message in Queue service
      * - Runs when order is created
      */
-    orderCreated({ order }: CreateOrderEvent) {
+    createOrder({ order }: CreateOrderEvent) {
         order.products.map((product) => {
             const message = JSON.stringify(product);
             this.queueService.publishInExchange('stock', 'decremented', message, {});

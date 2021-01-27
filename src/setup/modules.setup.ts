@@ -24,8 +24,8 @@ export async function setupModules(app: Express) {
     const productQueueConsumer = container.get(ProductQueueConsumer);
     const orderEventListener = container.get(OrderEventListener);
 
-    await productQueueConsumer.setup();
     await orderEventListener.setup();
+    await productQueueConsumer.setup();
 
     // config routes
     const server = new InversifyExpressServer(container, null, null, app);

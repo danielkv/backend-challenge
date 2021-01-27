@@ -11,10 +11,10 @@ const eventEmitter = new EventEmitter();
 @injectable()
 export class EventEmitterService implements IEventEmitter {
     emit<T = ObjectLiteral>(event: string, args: T): void {
-        eventEmitter.emit(event, args);
+        setImmediate(() => eventEmitter.emit(event, args));
     }
 
-    addListener<T = ObjectLiteral>(event: string, fn: (args: T) => void): void {
+    addListener<T = any>(event: string, fn: (args: T) => void): void {
         eventEmitter.addListener(event, fn);
     }
 }
