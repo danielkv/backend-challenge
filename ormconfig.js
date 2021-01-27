@@ -1,3 +1,5 @@
+const rootPath = process.env.NODE_ENV === 'production' ? '/build' : '';
+
 module.exports = {
     name: 'default',
     type: 'mysql',
@@ -6,8 +8,8 @@ module.exports = {
     username: process.env.MYSQL_USER,
     password: process.env.MYSQL_ROOT_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    entities: [__dirname + '/src/modules/**/*.entity.{ts,js}'],
-    migrations: ['./src/migrations/*.{ts,js}'],
+    entities: [__dirname + '/**/modules/**/*.entity.{ts,js}'],
+    migrations: [`.${rootPath}/src/migrations/*.{ts,js}`],
     cli: {
         migrationsDir: './src/migrations',
     },

@@ -1,4 +1,4 @@
-import { AbstractRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ProductEntity } from '../product.entity';
 
 /**

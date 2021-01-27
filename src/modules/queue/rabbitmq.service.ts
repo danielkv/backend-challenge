@@ -8,14 +8,40 @@ export class RabbitMQService implements IQueueService {
     private connection: Connection;
     private channel: Channel;
 
+    private limitErrors: number = 2;
+    private retryInterval: number = 3000; //milliseconds
+    private countErrors: number = 0;
+
     /**
      * Start a new connection and channel
      */
-    async start() {
-        if (!this.connection) this.connection = await amqplib.connect(process.env.RABBITMQ_URL);
-        if (!this.channel) this.channel = await this.connection.createChannel();
+    start() {
+        return new Promise(async (resolve, reject) => {
+            this.connect(resolve, reject);
+        });
+    }
 
-        return true;
+    async connect(resolve: (value: unknown) => void, reject: (value: unknown) => void) {
+        try {
+            this.countErrors++;
+
+            if (!this.connection)
+                this.connection = await amqplib.connect({
+                    hostname: process.env.RABBITMQ_HOST,
+                    port: Number(process.env.RABBITMQ_PORT),
+                    username: process.env.RABBITMQ_USERNAME,
+                    password: process.env.RABBITMQ_PASSWOR,
+                });
+
+            if (!this.channel) this.channel = await this.connection.createChannel();
+
+            resolve(true);
+        } catch (err) {
+            if (this.countErrors > this.limitErrors) reject(err);
+
+            console.log(`Error connecting to RabbitMQ. Trying again in ${this.retryInterval / 1000}s`);
+            setTimeout(() => this.connect(resolve, reject), this.retryInterval);
+        }
     }
 
     /**

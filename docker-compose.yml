@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.0'
 services:
     rabbitmq:
         image: rabbitmq:3.8-management
@@ -8,23 +8,42 @@ services:
         ports:
             - 5672:5672
             - 15672:15672
-    #stock-service:
-    #    image: deliverymuch/backend-challenge:stock-service
-    #    networks:
-    #        - app-network
-    #    environment:
-    #        - RABBITMQ_URL=amqp://rabbitmq
-    #    depends_on:
-    #        - rabbitmq
-    #        - db
-    #    links:
-    #        - rabbitmq
-    #        - db
-    #    restart: on-failure
-    db:
+    webapp:
+        build: .
+        command: ['yarn', 'start']
+        #command: ['wait-for-it\wait-for-it.sh', 'rabbitmq:5672', '--', 'yarn', 'start']
+        networks:
+            - app-network
+        env_file:
+            - prod.env
+        depends_on:
+            - rabbitmq
+            - mysql
+            - migration
+        links:
+            - 'rabbitmq'
+            - 'mysql'
+        ports:
+            - '3000:3000'
+        restart: on-failure
+    migration:
+        image: backend-challenge_webapp:latest
+        command: ['yarn', 'typeorm', 'migration:run']
+        networks:
+            - app-network
+        env_file:
+            - prod.env
+        depends_on:
+            - mysql
+        links:
+            - 'mysql'
+        restart: on-failure
+    mysql:
         image: mysql:8.0.17
         command: --default-authentication-plugin=mysql_native_password
         restart: on-failure
+        networks:
+            - app-network
         ports:
             - '3306:3306'
         environment:

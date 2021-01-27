@@ -15,22 +15,6 @@ afterAll(async (done) => {
 });
 
 describe('Orders', () => {
-    it('Return a list of order', async () => {
-        const app = express();
-
-        await setupServer(app);
-
-        await request(app).get('/orders').expect(200);
-    });
-
-    it('Find order by ID', async () => {
-        const app = express();
-
-        await setupServer(app);
-
-        await request(app).get('/orders/5').expect(200);
-    });
-
     it('Create a new order, product in stock', async () => {
         const app = express();
 
@@ -60,5 +44,21 @@ describe('Orders', () => {
                     throw new Error('Not right error');
             })
             .expect(500);
+    });
+
+    it('Find order by ID', async () => {
+        const app = express();
+
+        await setupServer(app);
+
+        await request(app).get('/orders/1').expect(200);
+    });
+
+    it('Return a list of order', async () => {
+        const app = express();
+
+        await setupServer(app);
+
+        await request(app).get('/orders').expect(200);
     });
 });
