@@ -10,6 +10,7 @@ services:
             - 15672:15672
     webapp:
         build: .
+        image: webapp
         command: ['yarn', 'start']
         #command: ['wait-for-it\wait-for-it.sh', 'rabbitmq:5672', '--', 'yarn', 'start']
         networks:
@@ -19,15 +20,15 @@ services:
         depends_on:
             - rabbitmq
             - mysql
-            - migration
         links:
             - 'rabbitmq'
             - 'mysql'
         ports:
             - '3000:3000'
-        restart: on-failure
+        restart: always
+
     migration:
-        image: backend-challenge_webapp:latest
+        image: webapp:latest
         command: ['yarn', 'typeorm', 'migration:run']
         networks:
             - app-network
@@ -35,9 +36,12 @@ services:
             - prod.env
         depends_on:
             - mysql
+            - webapp
         links:
             - 'mysql'
         restart: on-failure
+        environment:
+            - NODE_ENV=migration
     mysql:
         image: mysql:8.0.17
         command: --default-authentication-plugin=mysql_native_password

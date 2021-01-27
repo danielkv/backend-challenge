@@ -8,10 +8,10 @@ module.exports = {
     username: process.env.MYSQL_USER,
     password: process.env.MYSQL_ROOT_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    entities: [__dirname + '/**/modules/**/*.entity.{ts,js}'],
-    migrations: [`.${rootPath}/src/migrations/*.{ts,js}`],
+    entities: [__dirname + `${rootPath}/**/modules/**/*.entity.{ts,js}`],
+    migrations: [`.${rootPath}/src/migrations/*.ts`],
     cli: {
-        migrationsDir: './src/migrations',
+        migrationsDir: `.${rootPath}/src/migrations`,
     },
 
     logging: !['test', 'production'].includes(process.env.NODE_ENV),
