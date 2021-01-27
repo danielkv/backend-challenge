@@ -8,16 +8,14 @@ export class RabbitMQService implements IQueueService {
     private connection: Connection;
     private channel: Channel;
 
-    constructor() {
-        this.start();
-    }
-
     /**
      * Start a new connection and channel
      */
     async start() {
         this.connection = await amqplib.connect(process.env.RABBITMQ_URL);
         this.channel = await this.connection.createChannel();
+
+        return true;
     }
 
     /**

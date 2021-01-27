@@ -1,19 +1,21 @@
 import { Message } from 'amqplib';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { JsonContent } from 'inversify-express-utils';
 import { OrderEntity } from '../order/order.entity';
 import { IQueueService } from '../queue/queue-service.interface';
 import { ProductEntity } from './product.entity';
 import { UpdateProductStockService } from './services/update-product-stock.service';
 
+@injectable()
 export class ProductQueueConsumer {
     constructor(
         private updateProductStockService: UpdateProductStockService,
         @inject('QueueService') private queueService: IQueueService,
     ) {}
 
-    start() {
-        this.queueService.consume('stock', this.changeStock);
+    async setup() {
+        await this.queueService.start();
+        await this.queueService.consume('stock', this.changeStock);
     }
 
     changeStock(message: Message) {

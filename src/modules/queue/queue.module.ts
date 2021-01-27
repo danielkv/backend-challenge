@@ -15,7 +15,7 @@ export class QueueModule {
         // create container
         const module = new ContainerModule((bind: interfaces.Bind) => {
             // repository
-            bind('QueueProvider').to(RabbitMQService);
+            bind('QueueService').to(RabbitMQService);
         });
         return module;
     }

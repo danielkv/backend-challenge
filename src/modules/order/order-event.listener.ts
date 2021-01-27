@@ -12,14 +12,13 @@ export class OrderEventListener {
     constructor(
         @inject('EventEmitter') private eventEmitter: IEventEmitter,
         @inject('QueueService') private queueService: IQueueService,
-    ) {
-        this.setup();
-    }
+    ) {}
 
-    setup() {
+    async setup() {
         this.eventEmitter.addListener('orderCreated', this.orderCreated);
 
-        this.queueService.bindQueueToExchange('stock', 'stock', 'direct');
+        await this.queueService.start();
+        await this.queueService.bindQueueToExchange('stock', 'stock', 'direct');
     }
     /**
      * Publish a message in Queue service

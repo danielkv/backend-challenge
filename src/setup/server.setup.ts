@@ -8,7 +8,7 @@ export async function setupServer(app: Express): Promise<Express> {
     app.use(cors());
 
     // setup modules
-    setupModules(app);
+    await setupModules(app);
 
     // setup error handler
     app.use(errorHandler);
